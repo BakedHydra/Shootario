@@ -1,13 +1,17 @@
 using UnityEngine;
 using Unity.Mathematics;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float Acceleration = 20f;
     [SerializeField] private float MaxSpeed = 10f;
+    [SerializeField] private float MaxFallSpeed = 100f;
     [SerializeField] private float JumpForce = 300f;
-    [SerializeField] private float DashAcceleration = 100f;
+    [SerializeField] private float DashAcceleration = 150f;
+
     private bool OnGround = false;
+    private bool DashAvailable = true;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -23,35 +27,28 @@ public class PlayerController : MonoBehaviour
         OnGround = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
         float horizontalAxis = Input.GetAxisRaw("Horizontal");
         float verticalAxis = Input.GetAxisRaw("Vertical");
 
         Rigidbody rigidbody = gameObject.GetComponent<Rigidbody>();
-        if (Mathf.Max(Mathf.Abs(rigidbody.linearVelocity.x), Mathf.Abs(rigidbody.linearVelocity.z)) <= MaxSpeed)
+
+        if (horizontalAxis != 0 || verticalAxis != 0) 
         {
-            rigidbody.AddForce(new Vector3(horizontalAxis * Acceleration, 0, verticalAxis * Acceleration), ForceMode.Force);
-            Debug.Log(horizontalAxis.ToString());
-        }
-        else 
-        {
-            if (Mathf.Abs(rigidbody.linearVelocity.x) > MaxSpeed)
+            if (rigidbody.linearVelocity.magnitude <= MaxSpeed)
             {
-                rigidbody.linearVelocity = new Vector3(rigidbody.linearVelocity.x - (rigidbody.linearVelocity.x - MaxSpeed), rigidbody.linearVelocity.y, rigidbody.linearVelocity.z);
-            } 
-            else
-            if (Mathf.Abs(rigidbody.linearVelocity.z) > MaxSpeed)
+                rigidbody.AddForce(new Vector3(horizontalAxis * Acceleration, 0, verticalAxis * Acceleration), ForceMode.Force);
+            }
+            else 
             {
-                rigidbody.linearVelocity = new Vector3(rigidbody.linearVelocity.x, rigidbody.linearVelocity.y, rigidbody.linearVelocity.z - (rigidbody.linearVelocity.z - MaxSpeed));
+                rigidbody.AddForce(-rigidbody.linearVelocity.normalized * 2, ForceMode.Force);
             }
         }
-
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            rigidbody.AddForce(new Vector3(horizontalAxis * DashAcceleration, 0, verticalAxis * DashAcceleration), ForceMode.Impulse);
-
+            //rigidbody.AddForce(new Vector3(horizontalAxis * DashAcceleration, 0, verticalAxis * DashAcceleration), ForceMode.Impulse);
+            Dash(rigidbody, new Vector3(horizontalAxis, 0, verticalAxis), DashAcceleration, 1);
         }
 
         if (OnGround)
@@ -60,6 +57,37 @@ public class PlayerController : MonoBehaviour
             {
                 rigidbody.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
             }
+        }
+
+        rigidbody.linearVelocity = new Vector3(
+            Mathf.Clamp(rigidbody.linearVelocity.x, -MaxSpeed * 3, MaxSpeed * 3),
+            rigidbody.linearVelocity.y,
+            //Mathf.Clamp(rigidbody.linearVelocity.y, -MaxFallSpeed, MaxFallSpeed),
+            Mathf.Clamp(rigidbody.linearVelocity.z, -MaxSpeed * 3, MaxSpeed * 3)
+            );
+        Debug.Log(rigidbody.linearVelocity.ToString());
+    }
+    //IEnumerator Dash(Rigidbody rigidbody, Vector3 Direction, float DashAcceleration)
+    //{
+    //    rigidbody.AddForce(Direction * DashAcceleration, ForceMode.Impulse);
+    //    yield return new WaitForSeconds(5);
+
+    //}
+
+    IEnumerator CooldownRoutine(float Cooldown)
+    {
+        yield return new WaitForSeconds(Cooldown);
+        DashAvailable = true;
+    }
+
+    private void Dash(Rigidbody rigidbody, Vector3 Direction, float DashAcceleration, float Cooldown)
+    {
+        if (DashAvailable == true)
+        {
+            rigidbody.AddForce(Direction * DashAcceleration, ForceMode.Impulse);
+            DashAvailable = false;
+            StartCoroutine(CooldownRoutine(Cooldown));
+
         }
     }
 }
