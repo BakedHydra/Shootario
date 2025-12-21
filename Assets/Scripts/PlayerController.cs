@@ -1,93 +1,253 @@
-using UnityEngine;
-using Unity.Mathematics;
 using System.Collections;
+using System.ComponentModel;
+using Unity.Collections;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float Acceleration = 20f;
-    [SerializeField] private float MaxSpeed = 10f;
-    [SerializeField] private float MaxFallSpeed = 100f;
-    [SerializeField] private float JumpForce = 300f;
-    [SerializeField] private float DashAcceleration = 150f;
+    [Header("Movement Settings")]
+    [SerializeField] private float MoveSpeed = 0;
+    [SerializeField] private float DashForce = 0;
+    [SerializeField] private float DashCooldown = 0;
+    [SerializeField] private Camera Camera = null;
+    [SerializeField] private Transform CursorTr = null;
+    [SerializeField] private float Acceleration = 0;
 
-    private bool OnGround = false;
-    private bool DashAvailable = true;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [DoNotSerialize] public Weapon Weapon = null;
+
+    [Header("Player Health Settings")]
+    [SerializeField] private float MaxHealth = 0;
+    [DoNotSerialize] public bool canRegenerate = true;
+
+    [Header("Movement Audio Settings")]
+    [SerializeField] private AudioClip MoveSound;
+    [SerializeField] private AudioClip DashSound;
+    [SerializeField] private AudioSource PlayerAudioSource; 
+
+    public float CurrentHealth { get; private set; }
+
+    private Rigidbody rb;
+    private Transform tr;
+    private const float MAXSPEED = 200f;
+    private bool canUseDash = true;
+    private bool regenerationCooldown = false;
+    private bool canGetDamage = true;
+    [DoNotSerialize] public bool CanMove = true;
+    private bool isPistolAcquired = false;
+    private bool isRifleAcquired = false;
+    private bool isSniperAcquired = false;
+
+    [DoNotSerialize] public Weapon Pistol;
+    [DoNotSerialize] public Weapon Rifle;
+    [DoNotSerialize] public Weapon Sniper;
+
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
+        tr = transform;
 
-    }
-    private void OnTriggerEnter(Collider other)
-    {
-       OnGround = true; 
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        OnGround = false;
-    }
-
-    void Update()
-    {
-        float horizontalAxis = Input.GetAxisRaw("Horizontal");
-        float verticalAxis = Input.GetAxisRaw("Vertical");
-
-        Rigidbody rigidbody = gameObject.GetComponent<Rigidbody>();
-
-        if (horizontalAxis != 0 || verticalAxis != 0) 
+        if (DashCooldown == 0)
         {
-            if (rigidbody.linearVelocity.magnitude <= MaxSpeed)
-            {
-                rigidbody.AddForce(new Vector3(horizontalAxis * Acceleration, 0, verticalAxis * Acceleration), ForceMode.Force);
-            }
-            else 
-            {
-                rigidbody.AddForce(-rigidbody.linearVelocity.normalized * 2, ForceMode.Force);
-            }
+            DashCooldown = 1000;
         }
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            //rigidbody.AddForce(new Vector3(horizontalAxis * DashAcceleration, 0, verticalAxis * DashAcceleration), ForceMode.Impulse);
-            Dash(rigidbody, new Vector3(horizontalAxis, 0, verticalAxis), DashAcceleration, 1);
-        }
+        CurrentHealth = MaxHealth;
+    }
 
-        if (OnGround)
+    private void Update()
+    {
+        if (CanMove)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                rigidbody.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
-            }
+            //MousePositionView();
+            Movement();
+            WeaponControl();
+            HealthControl();
+        }
+    }
+
+    private void Movement()
+    {
+        float acceleration = Acceleration;
+        float speed = MoveSpeed;
+        float dashForce = DashForce;
+        float verticalMove = Input.GetAxisRaw("Vertical");
+        float horizontalMove = Input.GetAxisRaw("Horizontal");
+
+        void SetMaxVelocity(float maxSpeed)
+        {
+            rb.linearVelocity = new Vector3(
+                Mathf.Clamp(rb.linearVelocity.x, -maxSpeed, maxSpeed),
+                Mathf.Clamp(rb.linearVelocity.y, -maxSpeed, maxSpeed),
+                Mathf.Clamp(rb.linearVelocity.z, -maxSpeed, maxSpeed)
+                );
         }
 
-        rigidbody.linearVelocity = new Vector3(
-            Mathf.Clamp(rigidbody.linearVelocity.x, -MaxSpeed * 3, MaxSpeed * 3),
-            rigidbody.linearVelocity.y,
-            //Mathf.Clamp(rigidbody.linearVelocity.y, -MaxFallSpeed, MaxFallSpeed),
-            Mathf.Clamp(rigidbody.linearVelocity.z, -MaxSpeed * 3, MaxSpeed * 3)
-            );
-        Debug.Log(rigidbody.linearVelocity.ToString());
-    }
-    //IEnumerator Dash(Rigidbody rigidbody, Vector3 Direction, float DashAcceleration)
-    //{
-    //    rigidbody.AddForce(Direction * DashAcceleration, ForceMode.Impulse);
-    //    yield return new WaitForSeconds(5);
-
-    //}
-
-    IEnumerator CooldownRoutine(float Cooldown)
-    {
-        yield return new WaitForSeconds(Cooldown);
-        DashAvailable = true;
-    }
-
-    private void Dash(Rigidbody rigidbody, Vector3 Direction, float DashAcceleration, float Cooldown)
-    {
-        if (DashAvailable == true)
+        void PlayAudio(AudioClip audioClip, bool priority)
         {
-            rigidbody.AddForce(Direction * DashAcceleration, ForceMode.Impulse);
-            DashAvailable = false;
-            StartCoroutine(CooldownRoutine(Cooldown));
+            if (priority)
+            {
+                PlayerAudioSource.Stop();
+            }
+            if (!PlayerAudioSource.isPlaying)
+            {
+                PlayerAudioSource.clip = audioClip;
+                PlayerAudioSource.Play();
+                return;
+            }
+        }
 
+        void Running(float speed, float verticalMove, float horizontalMove)
+        {
+            Ray ray = Camera.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                tr.LookAt(new Vector3(hit.point.x, tr.position.y, hit.point.z));
+            }
+            if (verticalMove != 0 && rb.linearVelocity.magnitude <= speed)
+            {
+                rb.AddForce(verticalMove * acceleration * Vector3.forward);
+                PlayAudio(MoveSound, false);
+                SetMaxVelocity(speed);
+            }
+            if (horizontalMove != 0 && rb.linearVelocity.magnitude <= speed)
+            {
+                rb.AddForce(horizontalMove * acceleration * Vector3.right);
+                PlayAudio(MoveSound, false);
+                SetMaxVelocity(speed);
+            }
+            if (verticalMove == 0 && horizontalMove == 0) { PlayerAudioSource.Stop(); }
+            if (horizontalMove == 0 && verticalMove == 0)
+            {
+                rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
+            }
+            SetMaxVelocity(MAXSPEED);
+        }
+
+        void Dashing()
+        {
+            if (Input.GetKeyDown(KeyCode.LeftShift) && canUseDash)
+            {
+                StartCoroutine(DashCoroutine());
+                rb.AddForce(tr.forward * dashForce, ForceMode.Impulse);
+                PlayAudio(DashSound, true);
+            }
+        }
+
+        IEnumerator DashCoroutine()
+        {
+            canUseDash = false;
+            yield return new WaitForSeconds(DashCooldown);
+            canUseDash = true;
+        }
+
+        Running(speed, verticalMove, horizontalMove);
+        Dashing();
+    }
+    private void MousePositionView()
+    {
+        Ray ray = Camera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            CursorTr.position = hit.point;
+        }
+    }
+
+    private void WeaponControl()
+    {
+        if (Weapon == null && (!isPistolAcquired || !isRifleAcquired || !isSniperAcquired))
+        {
+            return;
+        }
+        Ray ray = Camera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            Weapon.Rotate(new Vector3(hit.point.x, transform.position.y, hit.point.z));
+        }
+        if (Input.GetKey(KeyCode.Mouse0))
+        {
+            Weapon.Shoot();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha1) && Weapon != Pistol.GetComponent<Weapon>())
+        {
+            Weapon.Hide();
+            Weapon = Pistol.GetComponent<Weapon>();
+            Weapon.Show();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2) && Weapon != Rifle.GetComponent<Weapon>())
+        {
+            Weapon.Hide();
+            Weapon = Rifle.GetComponent<Weapon>();
+            Weapon.Show();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3) && Weapon != Sniper.GetComponent<Weapon>())
+        {
+            Weapon.Hide();
+            Weapon = Sniper.GetComponent<Weapon>();
+            Weapon.Show();
+        }
+
+    }
+    public void GetDamage(float Damage)
+    {
+        IEnumerator GetDamageCoroutine()
+        {
+            Color color = GetComponent<Renderer>().material.GetColor("_BaseColor");
+            canGetDamage = false;
+            GetComponent<Renderer>().material.SetColor("_BaseColor", Color.red);
+            yield return new WaitForSeconds(0.7f);
+            GetComponent<Renderer>().material.SetColor("_BaseColor", color);
+            canGetDamage = true;
+        }
+        if (canGetDamage)
+        {
+            StartCoroutine(GetDamageCoroutine());
+            CurrentHealth -= Damage;
+        }
+    }
+    public void HealthRegeneration()
+    {
+        IEnumerator HealthRegenerationCoroutine()
+        {
+            regenerationCooldown = true;
+            CurrentHealth = Mathf.Max(CurrentHealth + 10, MaxHealth);
+            yield return new WaitForSeconds(1);
+            regenerationCooldown = false;
+        }
+
+        if (!regenerationCooldown)
+        {
+            StartCoroutine(HealthRegenerationCoroutine());
+        }
+    }
+    public void GetWeapon(string WeaponName)
+    {
+        if (WeaponName == "Pistol")
+        {
+            isPistolAcquired = true;
+            Pistol = Weapon;
+        }
+        if (WeaponName == "Rifle")
+        {
+            isRifleAcquired = true;
+            Rifle = Weapon;
+        }
+        if (WeaponName == "Sniper")
+        {
+            isSniperAcquired = true;
+            Sniper = Weapon;
+        }
+    }
+    private void HealthControl()
+    {
+        if (CurrentHealth <= 0)
+        {
+
+        }
+        if (CurrentHealth < MaxHealth && canRegenerate)
+        {
+            HealthRegeneration();
         }
     }
 }
+
