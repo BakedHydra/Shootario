@@ -107,14 +107,14 @@ public class Weapon : MonoBehaviour
             isReloading = true;
             ShootSource.PlayOneShot(ReloadSound, 1f);
             yield return new WaitForSeconds(ReloadTime);
+            BulletsRemaining = ClipSize;
             isReloading = false;
         }
 
         BulletsRemaining--;
-        if (BulletsRemaining <= 0)
+        if (BulletsRemaining <= 0 && !isReloading)
         {
             StartCoroutine(ReloadCoroutine(ReloadTime));
-            BulletsRemaining = ClipSize;
         }
     }
     public void Hide()
@@ -133,5 +133,9 @@ public class Weapon : MonoBehaviour
     public void Show()
     {
         gameObject.SetActive(true);
+        canShoot = true;
+        isReloading = false;
+        BulletAmountControl();
+
     }
 }
