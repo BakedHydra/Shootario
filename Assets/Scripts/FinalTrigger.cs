@@ -14,6 +14,7 @@ public class FinalTrigger : Trigger
         if (other.CompareTag("Player"))
         {
             other.GetComponent<PlayerController>().CanMove = false;
+            GameObject.FindWithTag("GameController").GetComponent<GameManager>().InterfaceUI();
             cutscene.stopped += OnCutsceneStopped;
             cutscene.Play();
         }
@@ -22,6 +23,7 @@ public class FinalTrigger : Trigger
     {
         cutscene.stopped -= OnCutsceneStopped;
         GameObject.FindWithTag("Player").GetComponent<PlayerController>().CanMove = true;
+        GameObject.FindWithTag("GameController").GetComponent<GameManager>().InterfaceUI();
         enableMove?.Invoke();
     }
 }

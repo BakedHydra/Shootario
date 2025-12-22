@@ -37,6 +37,7 @@ public class PenultimateRoomDirector : MonoBehaviour
             director.Play();
             director.stopped += OnCutsceneFinished;
             GameObject.FindWithTag("Player").GetComponent<PlayerController>().CanMove = true;
+            GameObject.FindWithTag("GameController").GetComponent<GameManager>().InterfaceUI();
             isActivated = true;
 
         }
@@ -46,6 +47,7 @@ public class PenultimateRoomDirector : MonoBehaviour
     {
         director.stopped -= OnCutsceneFinished;
         GameObject.FindWithTag("Player").GetComponent<PlayerController>().CanMove = true;
+        GameObject.FindWithTag("GameController").GetComponent<GameManager>().InterfaceUI();
         gameObject.SetActive(false);
     }
 }

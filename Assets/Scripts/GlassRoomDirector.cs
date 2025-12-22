@@ -21,6 +21,7 @@ public class GlassRoomDirector : MonoBehaviour
             Cutscene.Play();
             Cutscene.stopped += OnCutsceneFinished;
             GameObject.FindWithTag("Player").GetComponent<PlayerController>().CanMove = false;
+            GameObject.FindWithTag("GameController").GetComponent<GameManager>().InterfaceUI();
             isActivated = true;
         }
     }
@@ -28,5 +29,6 @@ public class GlassRoomDirector : MonoBehaviour
     {
         Cutscene.stopped -= OnCutsceneFinished;
         GameObject.FindWithTag("Player").GetComponent<PlayerController>().CanMove = true;
+        GameObject.FindWithTag("GameController").GetComponent<GameManager>().InterfaceUI();
     }
 }

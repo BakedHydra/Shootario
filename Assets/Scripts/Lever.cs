@@ -16,6 +16,7 @@ public class Lever : MonoBehaviour
             Cutscene.Play();
             Cutscene.stopped += OnCutsceneFinished;
             GameObject.FindWithTag("Player").GetComponent<PlayerController>().CanMove = false;
+            GameObject.FindWithTag("GameController").GetComponent<GameManager>().InterfaceUI();
             isActivated = true;
         }
     }
@@ -23,5 +24,6 @@ public class Lever : MonoBehaviour
     {
         Cutscene.stopped -= OnCutsceneFinished;
         GameObject.FindWithTag("Player").GetComponent<PlayerController>().CanMove = true;
+        GameObject.FindWithTag("GameController").GetComponent<GameManager>().InterfaceUI();
     }
 }

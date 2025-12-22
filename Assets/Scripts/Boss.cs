@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.UIElements;
 public class Boss: Enemy
 {
     [Header("Boss Enemy Settings")]
@@ -25,6 +26,8 @@ public class Boss: Enemy
     private bool isStage3Acquired = false;
 
     public static event Action<string> SpawnStageEnemies;
+    public static event Action BossHealthBarActive;
+    public static event Action<float> BossHealthBarPercentile;
 
     private void Start()
     {
@@ -34,7 +37,15 @@ public class Boss: Enemy
         startColor = material.GetColor("_BaseColor");
         target = GameObject.FindWithTag("Player").transform;
         canMove = false;
+        BossBarActivate();
+        HealthBarControl();
     }
+
+    private void BossBarActivate()
+    {
+        BossHealthBarActive?.Invoke();
+    }
+
     private void Update()
     {
         IEnumerator GiveDamageCoroutine()
@@ -133,8 +144,14 @@ public class Boss: Enemy
     public void EnableMove()
     {
         canMove = true;
+        FinalTrigger.enableMove -= EnableMove;
     }
 
+    private void HealthBarControl()
+    {
+        float percent = Health / MaxHealth;
+        BossHealthBarPercentile?.Invoke(percent);
+    }
     public override void GetDamage(float damage, RaycastHit hit)
     {
         IEnumerator GetDamageCoroutine()
@@ -143,8 +160,8 @@ public class Boss: Enemy
             yield return new WaitForSeconds(0.25f);
             material.SetColor("_BaseColor", startColor);
         }
-        Debug.Log("Попал!");
         Health -= damage;
+        HealthBarControl();
         StartCoroutine(GetDamageCoroutine());
         if (Health <= 0)
         {
