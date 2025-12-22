@@ -1,5 +1,6 @@
 using System.Collections;
 using System.ComponentModel;
+using TMPro;
 using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -12,7 +13,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float DashForce = 0;
     [SerializeField] private float DashCooldown = 0;
     [SerializeField] private Camera Camera = null;
-    [SerializeField] private Transform CursorTr = null;
     [SerializeField] private float Acceleration = 0;
 
     [DoNotSerialize] public Weapon Weapon = null;
@@ -20,12 +20,16 @@ public class PlayerController : MonoBehaviour
     [Header("Player Health Settings")]
     [SerializeField] private float MaxHealth = 0;
     [DoNotSerialize] public bool canRegenerate = true;
+    [SerializeField] private GameObject healthBar = null;
+    [SerializeField] private TMP_Text healthBarText = null;
 
     [Header("Movement Audio Settings")]
     [SerializeField] private AudioClip MoveSound;
     [SerializeField] private AudioClip DashSound;
-    [SerializeField] private AudioSource PlayerAudioSource; 
+    [SerializeField] private AudioSource PlayerAudioSource;
 
+    [Header("Ammo Amount Settings")]
+    [SerializeField] private TMP_Text ammoText;
     public float CurrentHealth { get; private set; }
 
     private Rigidbody rb;
@@ -59,10 +63,16 @@ public class PlayerController : MonoBehaviour
     {
         if (CanMove)
         {
-            //MousePositionView();
             Movement();
             WeaponControl();
             HealthControl();
+        }
+        else
+        {
+            if (PlayerAudioSource.isPlaying)
+            {
+                PlayerAudioSource.Stop();
+            }
         }
     }
 
@@ -144,15 +154,6 @@ public class PlayerController : MonoBehaviour
         Running(speed, verticalMove, horizontalMove);
         Dashing();
     }
-    private void MousePositionView()
-    {
-        Ray ray = Camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit))
-        {
-            CursorTr.position = hit.point;
-        }
-    }
-
     private void WeaponControl()
     {
         if (Weapon == null && (!isPistolAcquired || !isRifleAcquired || !isSniperAcquired))
@@ -186,7 +187,7 @@ public class PlayerController : MonoBehaviour
             Weapon = Sniper.GetComponent<Weapon>();
             Weapon.Show();
         }
-
+        UpdateAmmoBar();
     }
     public void GetDamage(float Damage)
     {
@@ -210,7 +211,7 @@ public class PlayerController : MonoBehaviour
         IEnumerator HealthRegenerationCoroutine()
         {
             regenerationCooldown = true;
-            CurrentHealth = Mathf.Max(CurrentHealth + 10, MaxHealth);
+            CurrentHealth = Mathf.Min(CurrentHealth + 10, MaxHealth);
             yield return new WaitForSeconds(1);
             regenerationCooldown = false;
         }
@@ -240,14 +241,27 @@ public class PlayerController : MonoBehaviour
     }
     private void HealthControl()
     {
+        UpdateHealthBar();
         if (CurrentHealth <= 0)
         {
-
+            GameObject.FindWithTag("GameController").GetComponent<GameManager>().DeathUI();
+            return;
         }
         if (CurrentHealth < MaxHealth && canRegenerate)
         {
             HealthRegeneration();
         }
+    }
+    private void UpdateHealthBar()
+    {
+        float percentage = CurrentHealth / MaxHealth;
+        healthBar.transform.localScale = new Vector3(percentage, 1, 1);
+        healthBarText.text = CurrentHealth.ToString();
+    }
+
+    private void UpdateAmmoBar()
+    {
+        ammoText.text = Weapon.BulletsRemaining.ToString();
     }
 }
 

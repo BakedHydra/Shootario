@@ -5221,7 +5221,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
   Name: Sniper
   Damage: 150
-  FireRate: 50
+  FireRate: 200
   ClipSize: 5
   ReloadTime: 4
   Pivot: {fileID: 6689346842992485026}

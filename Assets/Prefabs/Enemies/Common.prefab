@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 7844384706906021273}
   - component: {fileID: 5971951790290095636}
   - component: {fileID: 4142111290179645926}
-  - component: {fileID: 8379956303739196193}
   - component: {fileID: 2515656068700770070}
   - component: {fileID: 5655505656544710297}
+  - component: {fileID: 8512513134183771631}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Enemy
@@ -114,21 +114,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8379956303739196193
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7112726477375406383}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ea1736e4b3f88e44abdcb1fbb9224d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  MaxHealth: 0
-  Damage: 0
-  parent: {fileID: 7756765486671966060}
 --- !u!195 &2515656068700770070
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -178,6 +163,21 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &8512513134183771631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7112726477375406383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 085328678b4ade74f921d706a34ee220, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeEnemy
+  MaxHealth: 100
+  Parent: {fileID: 7756765486671966060}
+  MeleeDamage: 20
 --- !u!1 &7756765486671966060
 GameObject:
   m_ObjectHideFlags: 0

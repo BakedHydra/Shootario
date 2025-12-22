@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 790020334822069902}
   - component: {fileID: 5653770221721894431}
   - component: {fileID: 8365899145444626201}
-  - component: {fileID: 5313978118199600984}
   - component: {fileID: 2308177898020210964}
   - component: {fileID: 1108781649288615917}
+  - component: {fileID: 6028872733719587363}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Enemy
@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 3, z: 1.5}
+  m_LocalScale: {x: 1.5, y: 2, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2768344246583161072}
@@ -115,27 +115,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5313978118199600984
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1384949889774450106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ea1736e4b3f88e44abdcb1fbb9224d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  MaxHealth: 120
-  Damage: 20
-  parent: {fileID: 4669966548466981601}
-  CanShoot: 1
-  ShootPoint: {fileID: 2768344246583161072}
-  ProjectilePrefab: {fileID: 8100781090509070059, guid: 1b715bed298e44b41a997c3bbf4cfed6, type: 3}
-  ReloadSpeed: 1
-  audioSource: {fileID: 2538917608087335710}
-  throwSound: {fileID: 8300000, guid: d9186c1625f0ca941a11348441839546, type: 3}
 --- !u!54 &2308177898020210964
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -185,6 +164,28 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &6028872733719587363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1384949889774450106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6139767ef2a65ca44827ca01320537fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShootingEnemy
+  MaxHealth: 120
+  Parent: {fileID: 4669966548466981601}
+  MeleeDamage: 20
+  RangeDamage: 35
+  ProjectileSpeed: 10
+  ShootPoint: {fileID: 2768344246583161072}
+  ProjectilePrefab: {fileID: 8100781090509070059, guid: 1b715bed298e44b41a997c3bbf4cfed6, type: 3}
+  ReloadSpeed: 1
+  audioSource: {fileID: 2538917608087335710}
+  throwSound: {fileID: 8300000, guid: d9186c1625f0ca941a11348441839546, type: 3}
 --- !u!1 &4669966548466981601
 GameObject:
   m_ObjectHideFlags: 0

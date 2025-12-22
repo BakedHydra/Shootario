@@ -2,19 +2,24 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    [Header("Projectile Settings")]
-    [SerializeField] private float Damage;
-    [SerializeField] private float Speed;
-    public void Initialize(Vector3 vector)
+    private float Damage;
+    private float Speed;
+    public void Initialize(Vector3 vector, float damage, float speed)
     {
-        GetComponent<Rigidbody>().AddForce(vector.normalized * Speed, ForceMode.Impulse);
+        Damage = damage;
+        Speed = speed;
+        GetComponent<Rigidbody>().AddForce(transform.forward * Speed, ForceMode.Impulse);
     }
-    public void OnCollisionEnter(Collision collision)
+    public void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player"))
         {
-            collision.gameObject.GetComponent<PlayerController>().GetDamage(Damage);
+            other.gameObject.GetComponent<PlayerController>().GetDamage(Damage);
         }
-        Destroy(gameObject);
+        else if (other.gameObject.CompareTag("Projectile"))
+        {
+            return;
+        }
+            Destroy(gameObject);
     }
 }

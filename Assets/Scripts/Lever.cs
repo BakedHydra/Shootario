@@ -21,6 +21,7 @@ public class Lever : MonoBehaviour
     }
     private void OnCutsceneFinished(PlayableDirector director)
     {
+        Cutscene.stopped -= OnCutsceneFinished;
         GameObject.FindWithTag("Player").GetComponent<PlayerController>().CanMove = true;
     }
 }

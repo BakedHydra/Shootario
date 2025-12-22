@@ -1,21 +1,24 @@
+using System;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
     [Header("Enemy Spawner Settings")]
-    [SerializeField] private GameObject EnemyType;
-    private Vector3 spawnPosition;
-    private Quaternion spawnRotation;
+    [SerializeField] protected GameObject EnemyType;
+    protected Vector3 spawnPosition;
+    protected Quaternion spawnRotation;
+    public static event Action OnSpawn;
 
-    private void Start()
+    protected virtual void Start()
     {
         spawnPosition = new Vector3(transform.position.x, transform.position.y + 2, transform.position.z);
         spawnRotation = transform.rotation;
     }
 
-    public void SpawnEnemy()
+    public virtual void SpawnEnemy()
     {
         Instantiate(EnemyType, spawnPosition, spawnRotation);
+        OnSpawn?.Invoke();
     }
 }
 

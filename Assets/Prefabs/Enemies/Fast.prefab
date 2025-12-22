@@ -45,8 +45,8 @@ GameObject:
   - component: {fileID: 7523271081217959800}
   - component: {fileID: 606166449787976526}
   - component: {fileID: 8364690642992762940}
-  - component: {fileID: 3068872643405260157}
   - component: {fileID: 1279014188231685162}
+  - component: {fileID: 6606777374832878584}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Enemy
@@ -64,7 +64,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.01155, y: 0.5, z: -0.25545}
-  m_LocalScale: {x: 0.6, y: 1.5, z: 1}
+  m_LocalScale: {x: 0.8, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6588561482752732197}
@@ -156,7 +156,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.7
-  m_Speed: 12
+  m_Speed: 11
   m_Acceleration: 50
   avoidancePriority: 50
   m_AngularSpeed: 1080
@@ -168,21 +168,6 @@ NavMeshAgent:
   m_BaseOffset: 0.49999997
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 2
---- !u!114 &3068872643405260157
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6623042804332022365}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ea1736e4b3f88e44abdcb1fbb9224d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  MaxHealth: 80
-  Damage: 30
-  parent: {fileID: 5106489392763721744}
 --- !u!54 &1279014188231685162
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -210,3 +195,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &6606777374832878584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6623042804332022365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 085328678b4ade74f921d706a34ee220, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeEnemy
+  MaxHealth: 80
+  Parent: {fileID: 5106489392763721744}
+  MeleeDamage: 15
