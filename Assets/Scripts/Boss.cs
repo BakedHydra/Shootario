@@ -1,10 +1,6 @@
 using System;
 using System.Collections;
-using System.Runtime.CompilerServices;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.UIElements;
 public class Boss: Enemy
 {
     [Header("Boss Enemy Settings")]

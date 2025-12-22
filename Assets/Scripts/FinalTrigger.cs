@@ -24,6 +24,7 @@ public class FinalTrigger : Trigger
         cutscene.stopped -= OnCutsceneStopped;
         GameObject.FindWithTag("Player").GetComponent<PlayerController>().CanMove = true;
         GameObject.FindWithTag("GameController").GetComponent<GameManager>().InterfaceUI();
+
         enableMove?.Invoke();
     }
 }
