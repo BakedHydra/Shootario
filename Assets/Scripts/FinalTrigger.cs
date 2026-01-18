@@ -1,8 +1,6 @@
 using System;
 using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.Rendering.Universal;
-
 public class FinalTrigger : Trigger
 {
     [Header("Final Trigger Settings")]
@@ -11,7 +9,7 @@ public class FinalTrigger : Trigger
     protected override void OnTriggerEnter(Collider other)
     {
         base.OnTriggerEnter(other);
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !isUsed)
         {
             other.GetComponent<PlayerController>().CanMove = false;
             GameObject.FindWithTag("GameController").GetComponent<GameManager>().InterfaceUI();

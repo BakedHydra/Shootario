@@ -855,7 +855,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3110714201137803016, guid: 91ae9411a4d02cf41964a3f538884b64, type: 3}
       propertyPath: ShootVolume
-      value: 0.2
+      value: 0.1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1634,7 +1634,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6955880742668035996, guid: e255ad384286fce4f876c07a7e5e1d25, type: 3}
       propertyPath: ShootVolume
-      value: 0.5
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 8861018534708125288, guid: e255ad384286fce4f876c07a7e5e1d25, type: 3}
       propertyPath: m_Name
