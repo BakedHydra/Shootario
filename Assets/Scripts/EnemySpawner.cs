@@ -7,6 +7,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] protected GameObject EnemyType;
     protected Vector3 spawnPosition;
     protected Quaternion spawnRotation;
+    protected bool isEnemySpawned = false;
     public static event Action OnSpawn;
 
     protected virtual void Start()
@@ -17,8 +18,12 @@ public class EnemySpawner : MonoBehaviour
 
     public virtual void SpawnEnemy()
     {
-        Instantiate(EnemyType, spawnPosition, spawnRotation);
-        OnSpawn?.Invoke();
+        if (!isEnemySpawned)
+        {
+            Instantiate(EnemyType, spawnPosition, spawnRotation);
+            OnSpawn?.Invoke();
+            isEnemySpawned = true;
+        }
     }
 }
 

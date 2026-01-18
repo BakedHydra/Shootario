@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
         CurrentHealth = MaxHealth;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (CanMove)
         {
@@ -126,9 +126,9 @@ public class PlayerController : MonoBehaviour
                 PlayAudio(MoveSound, false);
                 SetMaxVelocity(speed);
             }
-            if (verticalMove == 0 && horizontalMove == 0) { PlayerAudioSource.Stop(); }
             if (horizontalMove == 0 && verticalMove == 0)
             {
+                PlayerAudioSource.Stop();
                 rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
             }
             SetMaxVelocity(MAXSPEED);

@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class BossHelpersSpawner : EnemySpawner
 {
@@ -15,6 +13,7 @@ public class BossHelpersSpawner : EnemySpawner
 
     public void SpawnBossHelper(string stage)
     {
+        
         if (stage == Stage)
         {
             base.SpawnEnemy();
